@@ -99,7 +99,8 @@ o:value("gfw", translate("GFW List Mode"))
 o:value("router", translate("IP Route Mode"))
 o:value("all", translate("Global Mode"))
 o:value("oversea", translate("Oversea Mode"))
-o.default = gfw
+o:value("none", translate("None Mode"))
+o.default = "none"
 
 o = s:option(ListValue, "dports", translate("Proxy Ports"))
 o:value("1", translate("All Ports"))

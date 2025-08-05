@@ -1328,6 +1328,10 @@ msgstr ""
 msgid "Oversea Mode"
 msgstr "海外用户回国模式"
 
+#: applications/luci-app-ssr-plus/luasrc/model/cbi/shadowsocksr/client.lua:102
+msgid "None Mode"
+msgstr "无模式"
+
 #: applications/luci-app-ssr-plus/luasrc/model/cbi/shadowsocksr/client.lua:147
 msgid "Oversea Mode DNS-1 (114.114.114.114)"
 msgstr ""

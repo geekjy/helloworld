@@ -17,18 +17,17 @@ LOCK_FILE=/var/lock/ssrplus.lock
 LOG_FILE=/var/log/ssrplus.log
 TMP_PATH=/var/etc/ssrplus
 TMP_BIN_PATH=$TMP_PATH/bin
-# 设置 DNSMASQ_CONF_DIR 和 TMP_DNSMASQ_PATH
+# 设置 DNSMASQ_CONF_DIR �?TMP_DNSMASQ_PATH
 if [ -f /etc/openwrt_release ]; then
-    # 获取默认的 DNSMASQ 配置 ID
+    # 获取默认�?DNSMASQ 配置 ID
     DEFAULT_DNSMASQ_CFGID="$(uci -q show "dhcp.@dnsmasq[0]" | awk 'NR==1 {split($0, conf, /[.=]/); print conf[2]}')"
-    # 从 conf-dir 行中提取配置目录路径
+    # �?conf-dir 行中提取配置目录路径
     if [ -f "/tmp/etc/dnsmasq.conf.$DEFAULT_DNSMASQ_CFGID" ]; then
         DNSMASQ_CONF_DIR="$(awk -F '=' '/^conf-dir=/ {print $2}' "/tmp/etc/dnsmasq.conf.$DEFAULT_DNSMASQ_CFGID")"
     else
         DNSMASQ_CONF_DIR="/tmp/dnsmasq.d"
     fi
-    # 设置 TMP_DNSMASQ_PATH，并去除路径末尾的斜杠
-    TMP_DNSMASQ_PATH="${DNSMASQ_CONF_DIR%*/}/dnsmasq-ssrplus.d"
+    # 设置 TMP_DNSMASQ_PATH，并去除路径末尾的斜�?    TMP_DNSMASQ_PATH="${DNSMASQ_CONF_DIR%*/}/dnsmasq-ssrplus.d"
 fi
 
 chain_config_file=		   #generate shadowtls chain proxy config file
@@ -182,7 +181,7 @@ ln_start_bin() {
 	fi
 	#echo "${file_func} $*" >&2
 	[ -x "${file_func}" ] || {
-		echolog "找不到 ${file_func}，无法启动..."
+		echolog "找不�?${file_func}，无法启�?.."
 		echolog "-----------end------------"
 		_exit 2
 	}
@@ -262,8 +261,7 @@ start_dns() {
 				cleaned_file="$TMP_PATH/cleaned_dns.list"
 				temp_file="$TMP_PATH/temp_dns.list"
 				> "$cleaned_file"
-				# 清理输入文件并去重
-				while IFS= read -r line || [ -n "$line" ]; do
+				# 清理输入文件并去�?				while IFS= read -r line || [ -n "$line" ]; do
 				    line=$(echo "$line" | sed -E 's/^[ \t\r]+//; s/[ \t\r]+$//')
 					[ -z "$line" ] && continue
 					echo "$line" | grep -qE '^#' && continue
@@ -312,8 +310,7 @@ start_dns() {
 		6)
 			local chinadns_ng_proto="$(uci_get_by_type global chinadns_ng_proto)"
 			local chinadns_ng_dns=""
-			# 遍历每个 DNS 服务器
-			IFS=','  # 设置分隔符为逗号
+			# 遍历每个 DNS 服务�?			IFS=','  # 设置分隔符为逗号
 			for chinadns_ng_server in $dnsserver; do
 				# 处理单个服务器地址
 				local chinadns_ng_ip="${chinadns_ng_server%%:*}"
@@ -332,11 +329,9 @@ start_dns() {
             					chinadns_ng_server="${chinadns_ng_proto}://${chinadns_ng_ip}#${chinadns_ng_port}"
             					;;
 				esac
-				# 添加到参数列表
-				chinadns_ng_dns="${chinadns_ng_dns} -t ${chinadns_ng_server}"
+				# 添加到参数列�?				chinadns_ng_dns="${chinadns_ng_dns} -t ${chinadns_ng_server}"
 			done
-			unset IFS  # 恢复默认分隔符
-			dnsserver="$chinadns_ng_dns"
+			unset IFS  # 恢复默认分隔�?			dnsserver="$chinadns_ng_dns"
 			ln_start_bin $(first_type chinadns-ng) chinadns-ng -b 127.0.0.1 -l $tmp_dns_port -l $dns_port -p 3 -d gfw $dnsserver -N --filter-qtype 64,65 -f -r --cache 4096 --cache-stale 86400 --cache-refresh 20
 			echolog "ChinaDNS-NG query and cache Started!"
 			pdnsd_enable_flag=6
@@ -366,15 +361,14 @@ start_dns() {
 	if [ "$(uci_get_by_type global apple_optimization 1)" == "1" ]; then
 		local new_appledns="$(uci_get_by_type global apple_dns)"
 		if [ -n "$new_appledns" ]; then		
-			sed -i 's/[[:space:]]//g' /etc/ssrplus/applechina.conf #去除所有空白字符
-			local old_appledns=$(grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' /etc/ssrplus/applechina.conf | sort -u)
+			sed -i 's/[[:space:]]//g' /etc/ssrplus/applechina.conf #去除所有空白字�?			local old_appledns=$(grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' /etc/ssrplus/applechina.conf | sort -u)
 			if [ -n "$old_appledns" ] && [ "$old_appledns" != "$new_appledns" ]; then
 				sed -i "s,$(printf '%s' "$old_appledns"),$(printf '%s' "$new_appledns"),g" /etc/ssrplus/applechina.conf
 			fi
 		fi
-		echolog "Apple 域名中国大陆 CDN 的 优化规则正在加载。"
+		echolog "Apple 域名中国大陆 CDN �?优化规则正在加载�?
 		cp -f /etc/ssrplus/applechina.conf $TMP_DNSMASQ_PATH/
-		echolog "Apple 域名中国大陆 CDN 的 优化规则加载完毕。"
+		echolog "Apple 域名中国大陆 CDN �?优化规则加载完毕�?
 	fi
 }
 
@@ -669,8 +663,7 @@ shunt_dns_command() {
 			cleaned_file="$TMP_PATH/cleaned_dns_servers.list"
 			temp_file="$TMP_PATH/temp_dns_servers.list"
 			> "$cleaned_file"
-			# 清理输入文件并去重
-			while IFS= read -r line || [ -n "$line" ]; do
+			# 清理输入文件并去�?			while IFS= read -r line || [ -n "$line" ]; do
 			    line=$(echo "$line" | sed -E 's/^[ \t\r]+//; s/[ \t\r]+$//')
 				[ -z "$line" ] && continue
 				echo "$line" | grep -qE '^#' && continue
@@ -718,8 +711,7 @@ shunt_dns_command() {
 	5)
 		local chinadns_ng_shunt_proto="$(uci_get_by_type global chinadns_ng_shunt_proto)"
 		local chinadns_ng_shunt_dns=""
-		# 遍历每个 DNS 服务器
-		IFS=','  # 设置分隔符为逗号
+		# 遍历每个 DNS 服务�?		IFS=','  # 设置分隔符为逗号
 		for chinadns_ng_shunt_server in $shunt_dnsserver; do
 			# 处理单个服务器地址
 			local chinadns_ng_shunt_ip="${chinadns_ng_shunt_server%%:*}"
@@ -738,11 +730,9 @@ shunt_dns_command() {
             				chinadns_ng_shunt_server="${chinadns_ng_shunt_proto}://${chinadns_ng_shunt_ip}#${chinadns_ng_shunt_port}"
             				;;
 			esac
-			# 添加到参数列表
-			chinadns_ng_shunt_dns="${chinadns_ng_shunt_dns} -t ${chinadns_ng_shunt_server}"
+			# 添加到参数列�?			chinadns_ng_shunt_dns="${chinadns_ng_shunt_dns} -t ${chinadns_ng_shunt_server}"
 		done
-		unset IFS  # 恢复默认分隔符
-		shunt_dnsserver="$chinadns_ng_shunt_dns"
+		unset IFS  # 恢复默认分隔�?		shunt_dnsserver="$chinadns_ng_shunt_dns"
 		# 启动 chinadns-ng
 		ln_start_bin $(first_type chinadns-ng) chinadns-ng -b 127.0.0.1 -l $tmp_port -l $tmp_shunt_dns_port -p 3 -d gfw $shunt_dnsserver -N --filter-qtype 64,65 -f -r --cache 4096 --cache-stale 86400 --cache-refresh 20
 		echolog "ChinaDNS-NG shunt query and cache Started!"
@@ -752,20 +742,18 @@ shunt_dns_command() {
 
 shunt_dns_config_file_port() {
     if [ "$LOCAL_SERVER" == "$SHUNT_SERVER" ]; then
-        # NetFlix 和 全局socks 节点相同
+        # NetFlix �?全局socks 节点相同
         if [ "$(uci_get_by_type socks5_proxy socks5_auth nil)" != "noauth" ]; then
-            # 全局socks 有密码，NetFlix 不能使用 auth 验证，需更换为新端口并使用无密码的 socks 配置用于分流
+            # 全局socks 有密码，NetFlix 不能使用 auth 验证，需更换为新端口并使用无密码�?socks 配置用于分流
             # 新增NetFlix dns 使用端口
             local port=$tmp_shunt_local_port
             jq --arg port "$port" '.inbounds |= .[0:1] + [{"protocol":"socks","port":($port | tonumber),"settings":{"udp":true,"auth":"noauth"}}] + .[1:]' "$shunt_config_file" > "$shunt_config_file.tmp" && mv "$shunt_config_file.tmp" $shunt_config_file
-            echo $port  # 返回端口号
-            return 0  # 成功返回
+            echo $port  # 返回端口�?            return 0  # 成功返回
         else
             sed -i -e '/"mixed"/d' $shunt_config_file
         fi
     else
-        # NetFlix 和 全局 socks 节点不相同
-        if [ "$(uci_get_by_type socks5_proxy socks5_auth nil)" != "noauth" ]; then
+        # NetFlix �?全局 socks 节点不相�?        if [ "$(uci_get_by_type socks5_proxy socks5_auth nil)" != "noauth" ]; then
             # 全局socks 有密码，NetFlix不能使用auth验证，需设置为无密码的socks配置用于分流
             # 删除 NetFlix dns 端口密码验证
             sed -i \
@@ -776,8 +764,7 @@ shunt_dns_config_file_port() {
             sed -i -e '/"mixed"/d' $shunt_config_file
         fi
     fi
-    # 使用传入的端口
-    echo $1  # 返回传入的端口号
+    # 使用传入的端�?    echo $1  # 返回传入的端口号
     return 0  # 成功返回
 }
 
@@ -946,7 +933,7 @@ start_local() {
 		echolog "$(get_name $type) program is: $ss_program"
 		# 获取当前软链接指向的执行文件路径
 		old_ss_program=$(readlink -f "$TMP_PATH/bin/${type}-local" 2>/dev/null)
-		# **当 新旧执行文件路径不同时，删除旧链接**
+		# **�?新旧执行文件路径不同时，删除旧链�?*
 		if [ "$old_ss_program" != "$ss_program" ]; then
 			rm -rf "$TMP_PATH/bin/${type}-local"
 		fi
@@ -1148,10 +1135,9 @@ load_config() {
 		GLOBAL_SERVER=$switch_server
 	fi
 	if [ "$(uci_get_by_type socks5_proxy enabled 0)" == "1" ]; then
-		# 只有开启 全局socks 才需要取值
-		LOCAL_SERVER=$(uci_get_by_type socks5_proxy server nil)
+		# 只有开�?全局socks 才需要取�?		LOCAL_SERVER=$(uci_get_by_type socks5_proxy server nil)
 	else
-		# 没有开启 设置为 nil
+		# 没有开�?设置�?nil
 		LOCAL_SERVER=nil
 	fi
 	if [ "$GLOBAL_SERVER" == "nil" ]; then
@@ -1163,10 +1149,9 @@ load_config() {
 	fi
 	UDP_RELAY_SERVER=$(uci_get_by_type global udp_relay_server nil)
 	if [ "$(uci_get_by_type global netflix_enable 0)" == "1" ]; then
-		# 只有开启 NetFlix分流 才需要取值
-		SHUNT_SERVER=$(uci_get_by_type global netflix_server nil)
+		# 只有开�?NetFlix分流 才需要取�?		SHUNT_SERVER=$(uci_get_by_type global netflix_server nil)
 	else
-		# 没有开启 设置为 nil
+		# 没有开�?设置�?nil
 		SHUNT_SERVER=nil
 	fi
 	tcp_config_file=$TMP_PATH/tcp-only-ssr-retcp.json
@@ -1358,11 +1343,11 @@ start_rules() {
 		router) echo "-r" ;;
 		oversea) echo "-c" ;;
 		all) echo "-z" ;;
+		none) echo "" ;;
 		esac
 	}
 	if [ "$(uci_get_by_type global dports)" == "3" ]; then
-		local custom_ports=$(uci_get_by_name $GLOBAL_SERVER custom_ports)  #  custom_ports 存储了用户自定义的端口
-		if [ -n "$custom_ports" ]; then
+		local custom_ports=$(uci_get_by_name $GLOBAL_SERVER custom_ports)  #  custom_ports 存储了用户自定义的端�?		if [ -n "$custom_ports" ]; then
 			local proxyport="-m multiport --dports $custom_ports"
 		fi
 	else
@@ -1412,18 +1397,18 @@ start() {
 		add_cron
 		start_switch
 	else
-		echolog "未启动主节点，禁止连接的域名正在加载。"
+		echolog "未启动主节点，禁止连接的域名正在加载�?
 		cat /etc/ssrplus/deny.list | sed '/^$/d' | sed '/#/d' | sed "/.*/s/.*/address=\/&\//" >$TMP_DNSMASQ_PATH/denylist.conf
-		echolog "禁止连接的域名加载完毕。"
+		echolog "禁止连接的域名加载完毕�?
 		if [ "$(uci_get_by_type global adblock 0)" == "1" ]; then
-			echolog "未启动主节点，广告过滤正在加载。"
+			echolog "未启动主节点，广告过滤正在加载�?
 			cp -f /etc/ssrplus/ad.conf $TMP_DNSMASQ_PATH/
 			if [ -f "$TMP_DNSMASQ_PATH/ad.conf" ]; then
 				for line in $(cat /etc/ssrplus/black.list); do sed -i "/$line/d" $TMP_DNSMASQ_PATH/ad.conf; done
 				for line in $(cat /etc/ssrplus/white.list); do sed -i "/$line/d" $TMP_DNSMASQ_PATH/ad.conf; done
 				for line in $(cat /etc/ssrplus/deny.list); do sed -i "/$line/d" $TMP_DNSMASQ_PATH/ad.conf; done
 			fi
-			echolog "广告过滤加载完毕。"
+			echolog "广告过滤加载完毕�?
 		fi
 	fi
 	/etc/init.d/dnsmasq restart >/dev/null 2>&1
@@ -1436,7 +1421,7 @@ start() {
 }
 
 boot() {
-	echolog "boot！"
+	echolog "boot�?
 	mkdir -p /var/run /var/lock /var/log $DNSMASQ_CONF_DIR $TMP_BIN_PATH $TMP_DNSMASQ_PATH
 	start
 }

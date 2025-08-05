@@ -114,6 +114,9 @@ ipset_r() {
 	all)
 		$IPT -A SS_SPEC_WAN_AC -j SS_SPEC_WAN_FW
 		;;
+	*)
+		# none mode - create chains but don't add any routing rules
+		;;
 	esac
 	ipset -N fplan hash:net 2>/dev/null
 	for ip in $LAN_FP_IP; do ipset -! add fplan $ip; done
@@ -255,6 +258,9 @@ tp_rule() {
 		;;
 	all)
 		$ipt -A SS_SPEC_TPROXY -p udp $PROXY_PORTS -j TPROXY --on-port "$LOCAL_PORT" --tproxy-mark 0x01/0x01
+		;;
+	*)
+		# none mode - create chains but don't add any routing rules
 		;;
 	esac
 	if [ -z "$Interface" ]; then
