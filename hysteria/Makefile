@@ -30,6 +30,9 @@ GO_PKG_LDFLAGS_X = \
 	$(GO_PKG)/app/v2/cmd.appPlatform=$(GO_OS) \
 	$(GO_PKG)/app/v2/cmd.appArch=$(GO_ARCH)
 
+export GOFLAGS += -buildvcs=false
+export GOWORK=off
+
 include $(INCLUDE_DIR)/package.mk
 include $(TOPDIR)/feeds/packages/lang/golang/golang-package.mk
 
