@@ -5,12 +5,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=hysteria
-PKG_VERSION:=2.6.2
+PKG_VERSION:=2.8.2
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/apernet/hysteria/tar.gz/app/v$(PKG_VERSION)?
-PKG_HASH:=4699431f0bc826da2bbd3939c0a78c4e7bfc02773fc3a62b24615c37ee89b266
+PKG_HASH:=1704f3dad12ee3f9fc7aeee9ba788fcc1662125c1d05ffd0f1a85ee3dd99bd08
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-app-v$(PKG_VERSION)
 
 PKG_LICENSE:=MIT
@@ -29,9 +29,6 @@ GO_PKG_LDFLAGS_X = \
 	$(GO_PKG)/app/v2/cmd.appType=release \
 	$(GO_PKG)/app/v2/cmd.appPlatform=$(GO_OS) \
 	$(GO_PKG)/app/v2/cmd.appArch=$(GO_ARCH)
-
-export GOFLAGS += -buildvcs=false
-export GOWORK=off
 
 include $(INCLUDE_DIR)/package.mk
 include $(TOPDIR)/feeds/packages/lang/golang/golang-package.mk
