@@ -30,19 +30,8 @@ GO_PKG_LDFLAGS_X = \
 	$(GO_PKG)/app/v2/cmd.appPlatform=$(GO_OS) \
 	$(GO_PKG)/app/v2/cmd.appArch=$(GO_ARCH)
 
-export GOFLAGS += -buildvcs=false
-
 include $(INCLUDE_DIR)/package.mk
 include $(TOPDIR)/feeds/packages/lang/golang/golang-package.mk
-
-define Build/Prepare
-	$(call Build/Prepare/Default)
-	sed -i 's/^go 1\.24/go 1.23/' \
-		$(PKG_BUILD_DIR)/go.work \
-		$(PKG_BUILD_DIR)/app/go.mod \
-		$(PKG_BUILD_DIR)/core/go.mod \
-		$(PKG_BUILD_DIR)/extras/go.mod
-endef
 
 define Package/hysteria
   SECTION:=net
