@@ -2087,7 +2087,7 @@ index 00000000..cb02a5d3
 +go run hello.go
 +rm hello.go
 diff --git a/lang/rust/Makefile b/lang/rust/Makefile
-index f63c5a5a..df5cd8bb 100644
+index f63c5a5a..4faacb04 100644
 --- a/lang/rust/Makefile
 +++ b/lang/rust/Makefile
 @@ -5,12 +5,12 @@
@@ -2107,7 +2107,7 @@ index f63c5a5a..df5cd8bb 100644
  HOST_BUILD_DIR:=$(BUILD_DIR)/host/rustc-$(PKG_VERSION)-src
  
  PKG_MAINTAINER:=Luca Barbato <lu_zero@luminem.org>
-@@ -75,9 +75,16 @@ HOST_CONFIGURE_ARGS = \
+@@ -75,9 +75,25 @@ HOST_CONFIGURE_ARGS = \
  	--release-channel=stable \
  	--enable-cargo-native-static \
  	--bootstrap-cache-path=$(DL_DIR)/rustc \
@@ -2115,6 +2115,15 @@ index f63c5a5a..df5cd8bb 100644
 +	--set=llvm.download-ci-llvm=false \
  	$(TARGET_CONFIGURE_ARGS)
  
++# patch-kernel.sh 打完补丁后会删除目标目录下所有 *.orig 文件,
++# 这会误删 rust vendored 的 Cargo.toml.orig,导致 cargo 校验 vendor 失败:
++#   failed to calculate checksum of: .../vendor/<crate>/Cargo.toml.orig
++# 在 prepare 之后从源码包恢复这些 .orig 文件。
++define Host/Prepare
++	$(call Host/Prepare/Default)
++	tar -C $(BUILD_DIR)/host -xJf $(DL_DIR)/$(PKG_SOURCE) --wildcards '*.orig'
++endef
++
 +# Rust bootstrap refuses to run if bootstrap.toml already exists.
 +# Remove any stale copy so re-running configure is idempotent.
 +define Host/Configure
@@ -2125,7 +2134,7 @@ index f63c5a5a..df5cd8bb 100644
  define Host/Uninstall
  	# Call the Uninstall script
  	[ -f $(RUST_UNINSTALL) ] && \
-@@ -90,8 +97,7 @@ define Host/Compile
+@@ -90,8 +106,7 @@ define Host/Compile
  	TARGET_CFLAGS="$(TARGET_CFLAGS)" \
  	$(PYTHON) $(HOST_BUILD_DIR)/x.py \
  		--build-dir $(HOST_BUILD_DIR)/build \
