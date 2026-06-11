@@ -5,7 +5,9 @@
 OpenWrt 官方的 **packages feed**（`feeds/packages`）里，我对 **golang** 和 **rust** 做了大量本地修改：
 
 - `golang`：新增 `golang1.26`、`golang-bootstrap`、`golang-version.mk`，改造了一整套 `.mk` 构建脚本
-- `rust`：修改 Makefile / patch / `.mk`，并加了一条修复（configure 前自动删除残留的 `bootstrap.toml`，否则反复编译会报 `Existing 'bootstrap.toml' detected. Exiting`）
+- `rust`：修改 Makefile / patch / `.mk`，并加了两条修复：
+  1. **configure 前自动删除残留的 `bootstrap.toml`** —— 否则反复编译会报 `Existing 'bootstrap.toml' detected. Exiting`（覆写 `Host/Configure`）
+  2. **prepare 后从源码包恢复 vendored 的 `*.orig` 文件** —— `scripts/patch-kernel.sh` 打补丁后会删掉目标目录所有 `*.orig`，连 rust 自带的 1629 个 `Cargo.toml.orig` 一起删了，导致 `make world`（尤其删掉 `build_dir` 重新解压后）报 `failed to calculate checksum of: .../vendor/<crate>/Cargo.toml.orig`（覆写 `Host/Prepare`）
 
 **问题**：`feeds.conf` 把 packages feed 锁定在固定提交（`^c7d1a8c1...`），每次执行
 `./scripts/feeds update -a` 都会强制 checkout 回官方版本，**把上面这些改动全部冲掉**。
