@@ -15,6 +15,23 @@ OpenWrt 官方的 **packages feed**（`feeds/packages`）里，我对 **golang**
 **解决**：把全部改动用 git 导出成一个补丁 `my-packages-fixes.patch`，更新 feeds 后再自动打回。
 > 注意：`helloworld` feed 是自己的 git 仓库，**不受影响**，无需处理。这里只针对官方 packages feed。
 
+## 另一个坑：xray-core 被官方 feed 覆盖
+
+官方 `packages` feed 里**也有 `xray-core`**（旧版，如 25.1.30），而 `feeds.conf` 里 `packages`
+排在 `helloworld` **前面**，所以 `./scripts/feeds install -a` 默认会用官方旧版**覆盖** helloworld 里的新版
+（如 26.5.9）。结果就是：helloworld 明明是新版，编出来却是旧版 xray。
+
+旧版 xray（< 26.1.31）会触发 ssr-plus 的一个 bug：vless 节点的 `tlsSettings` 生成成空数组 `[]`，
+xray 报 `cannot unmarshal array into ... StreamConfig.outbounds.streamSettings.tlsSettings`，节点起不来。
+（根因：gen_config.lua 里 `allowInsecure` 在 2026.6.1 后停用、新字段又要 xray ≥ 26.1.31 才生成，旧版两头落空。）
+
+**解决**：`feeds-rebuild.sh` 里加了 `./scripts/feeds install -f -p helloworld -a`，强制 helloworld 覆盖官方同名包。
+手动操作等价于：
+```sh
+./scripts/feeds install -f -p helloworld xray-core   # 强制单个包
+# 之后确认 .config 仍有 CONFIG_PACKAGE_xray-core=y（被重装可能掉），必要时补上再 make defconfig
+```
+
 ## 文件清单
 
 | 文件 | 作用 |

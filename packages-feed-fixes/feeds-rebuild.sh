@@ -1,6 +1,7 @@
 #!/bin/sh
 # ============================================================
-# 安全更新 feeds,并自动把本地改动(golang/rust 等)打回 packages feed
+# 安全更新 feeds,并:① 把本地改动(golang/rust 等)打回 packages feed
+#                    ② 强制让 helloworld 覆盖官方同名包(xray-core 等)
 # 替代手动的 ./scripts/feeds update -a && ./scripts/feeds install -a
 # 用法: cd /home/kali/openwrt && sh feeds-rebuild.sh
 # ============================================================
@@ -33,7 +34,14 @@ else
   echo "==> [2/3] 未找到补丁 $PATCH,跳过(可先运行 sh save-fixes.sh 生成)"
 fi
 
-echo "==> [3/3] 重新安装 feeds..."
+echo "==> [3/4] 重新安装 feeds..."
 ./scripts/feeds install -a
 
+echo "==> [4/4] 强制让 helloworld 覆盖官方同名包 (xray-core 等)..."
+# 官方 packages feed 里也有 xray-core/v2ray-core 等,且排在 helloworld 前面,
+# 默认会覆盖 helloworld 里的新版 -> 编出旧版 xray。这里强制改回 helloworld。
+./scripts/feeds install -f -p helloworld -a
+
 echo "==> 完成。现在可以 make -j\$(nproc) 编译了。"
+echo "    提示: 若包被重装过,确认 .config 里 CONFIG_PACKAGE_xray-core=y 仍在;"
+echo "          可执行 make defconfig 后再 grep 检查。"
